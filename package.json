@@ -3,7 +3,7 @@
     "displayName": "Multi Formatter",
     "description": "Run multiple formatters on your code",
     "version": "0.1.0",
-    "publisher": "examplePublisher",
+    "publisher": "kroe",
     "engines": {
         "vscode": "^1.80.0"
     },
