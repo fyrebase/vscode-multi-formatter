@@ -30,6 +30,7 @@ npm run install-ext
 - Control whether to save after each formatter or only at the end
 - Language-specific commands for targeted formatting
 - Clean and simple configuration format
+- Automatic detection of potential formatting conflicts
 
 ## Usage
 
@@ -77,6 +78,25 @@ Control whether to save the document after each formatter runs:
 
 - When `true` (default): The document is saved after each formatter runs, ensuring each formatter works on the results of the previous one
 - When `false`: The document is only saved at the end of the formatting sequence
+
+### Conflict Detection
+
+The extension can detect potential conflicts with VS Code's built-in formatting features:
+
+```json
+"multiFormatter.showFormattingConflictWarnings": true
+```
+
+- When `true` (default): The extension warns you if it detects conflicts with default formatters or format-on-save settings
+- When `false`: No warnings are shown about potential conflicts
+
+Conflicts may occur when:
+- A default formatter is set for a language you're using with Multi Formatter
+- Format on Save is enabled for languages configured in Multi Formatter
+
+When a conflict is detected, you can:
+- Open the relevant settings to resolve the conflict
+- Disable conflict detection if you understand the setup
 
 ## Language-Specific Commands
 

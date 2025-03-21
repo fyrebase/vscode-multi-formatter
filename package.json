@@ -2,7 +2,7 @@
     "name": "multi-formatter",
     "displayName": "Multi Formatter",
     "description": "Run multiple formatters on your code",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "publisher": "kroe",
     "engines": {
         "vscode": "^1.80.0"
@@ -12,7 +12,6 @@
     ],
     "main": "./dist/extension.js",
     "activationEvents": [
-        "onCommand:multiFormatter.format",
         "onStartupFinished"
     ],
     "contributes": {
@@ -20,6 +19,10 @@
             {
                 "command": "multiFormatter.format",
                 "title": "Format with Multiple Formatters"
+            },
+            {
+                "command": "multiFormatter.toggleDebug",
+                "title": "Multi Formatter: Toggle Debug Mode"
             }
         ],
         "configuration": {
@@ -51,6 +54,16 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Whether to save the document after each formatter runs"
+                },
+                "multiFormatter.showFormattingConflictWarnings": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Show warnings when potential formatter conflicts are detected"
+                },
+                "multiFormatter.debugMode": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable debug logging for Multi Formatter"
                 }
             }
         },
@@ -70,8 +83,8 @@
         "package": "webpack --mode production --devtool hidden-source-map",
         "lint": "eslint src --ext ts",
         "test": "vscode-test",
-        "vsix": "vsce package -o dist/multi-formatter-0.1.0.vsix",
-        "install-ext": "npm run vsix && code --install-extension dist/multi-formatter-0.1.0.vsix"
+        "vsix": "vsce package -o dist/multi-formatter-0.1.1.vsix",
+        "install-ext": "npm run vsix && cursor --install-extension dist/multi-formatter-0.1.1.vsix"
     },
     "devDependencies": {
         "@types/node": "^16.18.34",
