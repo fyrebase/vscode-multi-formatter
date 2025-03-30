@@ -1,115 +1,133 @@
 {
-    "name": "multi-formatter",
-    "displayName": "Multi Formatter",
-    "description": "Run multiple formatters on your code",
-    "version": "0.1.1",
-    "publisher": "kroe",
-    "engines": {
-        "vscode": "^1.80.0"
-    },
-    "categories": [
-        "Formatters"
+  "name": "multiformatter",
+  "displayName": "Multi-Formatter",
+  "description": "Chain multiple formatters to run in sequence on a document",
+  "version": "0.0.2",
+  "publisher": "kroe",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fyrebase/vscode-multi-formatter"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Formatters",
+    "Other"
+  ],
+  "keywords": [
+    "formatter",
+    "prettifier",
+    "multiple formatters",
+    "eslint",
+    "prettier",
+    "biome"
+  ],
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact",
+    "onLanguage:json",
+    "onLanguage:html",
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:less",
+    "onLanguage:php",
+    "onLanguage:ruby",
+    "onLanguage:erb",
+    "onLanguage:python"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "multiformatter.formatDocument",
+        "title": "Multi-Format Document"
+      },
+      {
+        "command": "multiformatter.formatSelection",
+        "title": "Multi-Format Selection"
+      }
     ],
-    "main": "./dist/extension.js",
-    "activationEvents": [
-        "onStartupFinished"
-    ],
-    "contributes": {
-        "commands": [
-            {
-                "command": "multiFormatter.format",
-                "title": "Format with Multiple Formatters"
-            },
-            {
-                "command": "multiFormatter.toggleDebug",
-                "title": "Multi Formatter: Toggle Debug Mode"
-            }
-        ],
-        "configuration": {
-            "title": "Multi Formatter",
-            "properties": {
-                "multiFormatter.formatters": {
-                    "type": "array",
-                    "default": [],
-                    "description": "List of formatters to run in sequence using the compact array format.",
-                    "items": {
-                        "type": "object",
-                        "required": ["language", "formatters"],
-                        "properties": {
-                            "language": {
-                                "type": "string",
-                                "description": "Language identifier (e.g., 'javascript', 'typescript', 'python')"
-                            },
-                            "formatters": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string"
-                                },
-                                "description": "Array of formatter command IDs to run in sequence"
-                            }
-                        }
-                    }
-                },
-                "multiFormatter.saveAfterEachFormatter": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Whether to save the document after each formatter runs"
-                },
-                "multiFormatter.showFormattingConflictWarnings": {
-                    "type": "boolean",
-                    "default": true,
-                    "description": "Show warnings when potential formatter conflicts are detected"
-                },
-                "multiFormatter.debugMode": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Enable debug logging for Multi Formatter"
-                }
-            }
+    "configuration": {
+      "title": "Multi-Formatter",
+      "properties": {
+        "multiformatter.languages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "javascript",
+            "typescript",
+            "javascriptreact",
+            "typescriptreact",
+            "json",
+            "html",
+            "css",
+            "scss",
+            "less",
+            "php",
+            "ruby",
+            "erb",
+            "python"
+          ],
+          "description": "List of languages to enable Multi-Formatter for."
         },
-        "keybindings": [
-            {
-                "command": "multiFormatter.format",
-                "key": "ctrl+alt+f",
-                "mac": "cmd+alt+f",
-                "when": "editorTextFocus"
-            }
-        ]
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run package",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "package": "webpack --mode production --devtool hidden-source-map",
-        "lint": "eslint src --ext ts",
-        "test": "vscode-test",
-        "vsix": "vsce package -o dist/multi-formatter-0.1.1.vsix",
-        "install-ext": "npm run vsix && cursor --install-extension dist/multi-formatter-0.1.1.vsix"
-    },
-    "devDependencies": {
-        "@types/node": "^16.18.34",
-        "@types/vscode": "^1.80.0",
-        "@typescript-eslint/eslint-plugin": "^6.7.0",
-        "@typescript-eslint/parser": "^6.7.0",
-        "@vscode/vsce": "^2.32.0",
-        "eslint": "^8.47.0",
-        "ts-loader": "^9.4.4",
-        "typescript": "^5.1.6",
-        "webpack": "^5.88.2",
-        "webpack-cli": "^5.1.4"
-    },
-    "repository": {
-        "type": "git",
-        "url": ""
-    },
-    "keywords": [
-        "formatter",
-        "multiple",
-        "chain",
-        "prettier",
-        "eslint",
-        "stylelint"
-    ],
-    "author": "",
-    "license": "MIT"
+        "multiformatter.formatters": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Additional formatters to run (in order) after the default formatter.",
+          "scope": "language-overridable"
+        },
+        "multiformatter.formatterDelay": {
+          "type": "number",
+          "default": 50,
+          "minimum": 10,
+          "maximum": 2000,
+          "description": "Delay in milliseconds between formatter operations to ensure they complete properly. Increase if formatters aren't being applied correctly."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test",
+    "vsix": "vsce package",
+    "install-vsix": "code --install-extension \"$(find . -maxdepth 1 -name 'multiformatter-*.vsix' | sort | tail -n 1)\" || code --install-extension \"$(ls -t multiformatter-*.vsix | head -1)\"",
+    "uninstall-vsix": "cursor --uninstall-extension kroe.multiformatter || true",
+    "build-and-install": "pnpm run vsix && pnpm run uninstall-vsix && pnpm run install-vsix",
+    "version-patch": "node build.js patch",
+    "version-minor": "node build.js minor",
+    "version-major": "node build.js major",
+    "version-custom": "node build.js custom",
+    "build": "node build.js",
+    "build-quick": "node build.js --skip-deps",
+    "clean": "rm -rf multiformatter-*.vsix || del multiformatter-*.vsix"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.96.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3",
+    "ts-loader": "^9.5.1",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "@vscode/test-cli": "^0.0.4",
+    "@vscode/test-electron": "^2.3.8"
+  }
 }
