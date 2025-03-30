@@ -1,168 +1,249 @@
-# Multi Formatter
+# Multi-Formatter for VS Code
 
-A VSCode extension that allows you to run multiple formatters on your code in sequence.
-
-## Installation
-
-### From VSIX File
-1. Download the `.vsix` file from the `dist` directory
-2. Open VSCode
-3. Go to Extensions view (Ctrl+Shift+X)
-4. Click on the "..." menu (top-right of Extensions view)
-5. Select "Install from VSIX..." 
-6. Choose the downloaded `.vsix` file
-
-Alternatively, you can install from the command line:
-```
-code --install-extension dist/multi-formatter-0.1.0.vsix
-```
-
-Or use the provided npm script:
-```
-npm run install-ext
-```
+Chain multiple formatters to run in sequence on your code files.
 
 ## Features
 
-- Configure and run multiple formatters for each language
-- Progress indicator shows formatting status
-- Supports both built-in VSCode formatters and extension commands
-- Control whether to save after each formatter or only at the end
-- Language-specific commands for targeted formatting
-- Clean and simple configuration format
-- Automatic detection of potential formatting conflicts
+- Run multiple formatters in sequence on a single file
+- Support for on-demand formatting and format-on-save
+- Skip formatting on files with no unsaved changes
+- Works with any existing formatter extensions
+
+## Installation
+
+### From VS Code Marketplace
+
+Coming soon!
+
+### From VSIX File
+
+1. Download the `.vsix` file from the releases
+2. Install using one of these methods:
+   - Through VS Code UI: Go to Extensions view → Click on "..." menu → "Install from VSIX..." → Select the downloaded file
+   - Using command line: `code --install-extension multiformatter-*.vsix` (where * is the version number)
+   - Using the extension manager: `Extension: Install from VSIX...` command in the Command Palette
+
+### Building and Installing Locally
+
+1. Clone the repository
+2. Run `npm install` or `pnpm install`
+3. Choose one of the build methods:
+
+#### Standard Build (Patch Version)
+
+```bash
+# Build with patch version increment (x.x.X+1)
+npm run version-patch
+```
+
+#### Minor Version Build
+
+```bash
+# Build with minor version increment (x.X+1.0)
+npm run version-minor
+```
+
+#### Major Version Build
+
+```bash
+# Build with major version increment (X+1.0.0)
+npm run version-major
+```
+
+#### Custom Version
+```bash
+# Set a specific version number
+npm run version-custom [version]
+```
+
+#### Build Without Version Change
+```bash
+npm run build-quick
+```
+
+### Manual Build and Install
+
+1. Run `npm run vsix` to create the VSIX package
+2. Uninstall previous version: `npm run uninstall-vsix`
+3. Install the new version: `npm run install-vsix` (dynamically finds the latest version)
+
+### Cleaning up
+
+```bash
+npm run clean
+```
+
+## Problem Solved
+
+VS Code, by default, only runs one formatter on save or via the format command, forcing users to choose a single default formatter. This extension enables running multiple formatters in sequence, addressing common scenarios like:
+
+- Using Prettier + ESLint together
+- Running Prettier + Stylelint
+- Applying an ERB beautifier followed by Prettier and an ERB linter
 
 ## Usage
 
-1. Install the extension
-2. Configure your formatters in `settings.json`:
+### Configuration
+
+After installing the extension, you need to configure two things:
+
+1. **Supported Languages**: Define which languages you want to enable multi-formatting for
+2. **Formatter Chains**: Configure which formatters to run (and in what order) for each language
+
+#### Step 1: Define Supported Languages
+
+In your `settings.json`, add:
 
 ```json
-"multiFormatter.formatters": [
-  {
-    "language": "javascriptreact",
-    "formatters": ["esbenp.prettier-vscode", "biomejs.biome"]
-  },
-  {
-    "language": "typescriptreact",
-    "formatters": ["esbenp.prettier-vscode", "biomejs.biome"]
-  }
+"multiformatter.languages": [
+  "javascript", 
+  "typescript", 
+  "json", 
+  "html", 
+  "erb"
 ]
 ```
 
-3. Use the command palette (Ctrl+Shift+P) and run "Format with Multiple Formatters"
-4. Alternatively, use the default keyboard shortcut `Ctrl+Alt+F` (`Cmd+Alt+F` on Mac)
+#### Step 2: Configure Formatters Per Language
 
-## Configuration Options
+There are two ways to configure formatters:
 
-### Formatters Array
-
-Configure which formatters to run and in what sequence:
-
-```json
-"multiFormatter.formatters": [
-  {
-    "language": "javascript", 
-    "formatters": ["prettier.formatDocument", "eslint.executeAutofix"]
-  }
-]
-```
-
-### Save Behavior
-
-Control whether to save the document after each formatter runs:
-
-```json
-"multiFormatter.saveAfterEachFormatter": true
-```
-
-- When `true` (default): The document is saved after each formatter runs, ensuring each formatter works on the results of the previous one
-- When `false`: The document is only saved at the end of the formatting sequence
-
-### Conflict Detection
-
-The extension can detect potential conflicts with VS Code's built-in formatting features:
-
-```json
-"multiFormatter.showFormattingConflictWarnings": true
-```
-
-- When `true` (default): The extension warns you if it detects conflicts with default formatters or format-on-save settings
-- When `false`: No warnings are shown about potential conflicts
-
-Conflicts may occur when:
-- A default formatter is set for a language you're using with Multi Formatter
-- Format on Save is enabled for languages configured in Multi Formatter
-
-When a conflict is detected, you can:
-- Open the relevant settings to resolve the conflict
-- Disable conflict detection if you understand the setup
-
-## Language-Specific Commands
-
-For each language you configure, the extension automatically creates a dedicated command:
-
-- `multiFormatter.format.javascript` - Format only JavaScript files
-- `multiFormatter.format.typescript` - Format only TypeScript files
-- etc.
-
-You can bind these commands to specific keyboard shortcuts:
-
+**Option 1: Language-specific settings (Recommended)**
 ```json
 {
-  "key": "ctrl+shift+j",
-  "command": "multiFormatter.format.javascript",
-  "when": "editorTextFocus && editorLangId == 'javascript'"
+  "[javascript]": {
+    "editor.defaultFormatter": "kroe.multiformatter",
+    "multiformatter.formatters": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint"
+    ],
+    "editor.formatOnSave": true
+  }
 }
 ```
 
-## How It Works
-
-When you run the command, the extension:
-
-1. Identifies the language of your current file
-2. Finds all configured formatters for that language
-3. Runs each formatter in sequence, saving in between (if configured)
-4. Displays progress and notifications
-
-## Example Configuration
-
-### Running Prettier then ESLint on JavaScript files:
+**Option 2: Global formatter settings**
 ```json
-"multiFormatter.formatters": [
-  {
-    "language": "javascript",
-    "formatters": ["prettier.formatDocument", "eslint.executeAutofix"]
-  }
+"multiformatter.formatters": [
+  "esbenp.prettier-vscode",
+  "dbaeumer.vscode-eslint"
 ]
 ```
 
-### Multiple languages configuration:
+The language-specific settings take precedence over the global settings.
+
+### Example Configurations
+
+#### JavaScript with Prettier + ESLint
+
 ```json
-"multiFormatter.formatters": [
-  {
-    "language": "javascript",
-    "formatters": ["prettier.formatDocument", "eslint.executeAutofix"]
-  },
-  {
-    "language": "typescript",
-    "formatters": ["prettier.formatDocument", "eslint.executeAutofix"]
-  },
-  {
-    "language": "css",
-    "formatters": ["stylelint.executeAutofix"]
+{
+  "multiformatter.languages": ["javascript", "typescript"],
+  
+  "[javascript]": {
+    "editor.defaultFormatter": "kroe.multiformatter",
+    "multiformatter.formatters": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint"
+    ],
+    "editor.formatOnSave": true
   }
-]
+}
 ```
 
-## Known Formatter Command IDs
+#### ERB Files
 
-- VSCode built-in: `editor.action.formatDocument`
-- Prettier: `prettier.formatDocument` or `prettier.forceFormatDocument`
-- ESLint: `eslint.executeAutofix`
-- Stylelint: `stylelint.executeAutofix`
-- Biome: `biomejs.biome`
+```json
+{
+  "multiformatter.languages": ["erb"],
+  
+  "[erb]": {
+    "editor.defaultFormatter": "kroe.multiformatter",
+    "multiformatter.formatters": [
+      "aliariff.vscode-erb-beautify",
+      "esbenp.prettier-vscode",
+      "manuelpuyol.erb-linter"
+    ],
+    "editor.formatOnSave": true
+  }
+}
+```
 
-## License
+#### TypeScript React (TSX) Files
 
-MIT 
+```json
+{
+  "multiformatter.languages": ["typescript", "typescriptreact"],
+  
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "kroe.multiformatter",
+    "multiformatter.formatters": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint"
+    ],
+    "editor.formatOnSave": true
+  }
+}
+```
+### How It Works
+
+When you format a document, these formatters will be executed in sequence:
+
+1. First, the default formatter set in `editor.defaultFormatter` will run (if specified)
+2. Then, each formatter in the `multiformatter.formatters` array will run in order
+3. The output of each formatter becomes the input to the next formatter
+4. Formatting is skipped if the document has no unsaved changes
+
+This allows you to combine formatters that handle different aspects of code style.
+
+### Commands
+
+- **Multi-Format Document**: Formats the entire active document with multiple formatters
+- **Multi-Format Selection**: Formats the selected text (not fully implemented yet)
+
+## Requirements
+
+- Ensure the formatter extensions you want to chain are installed
+- Configure them individually with their own settings
+
+## Extension Settings
+
+* `multiformatter.languages`: Array of language IDs to enable Multi-Formatter for
+* `multiformatter.formatters`: Array of formatter extension IDs to run in sequence (can be configured globally or per-language)
+* `multiformatter.formatterDelay`: Delay in milliseconds between formatter operations (increase if formatters aren't being applied correctly)
+
+## Known Issues
+
+- Range formatting (selection) is not fully implemented yet
+- Some formatters may not work well when chained (if they have conflicting rules)
+
+## Release Notes
+
+### 0.0.1
+
+Initial release of Multi-Formatter with support for:
+- Chaining multiple formatters
+- Per-language formatter configuration
+- Formatting only dirty documents
+- Dynamic extension ID detection
+
+## Following extension guidelines
+
+Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+
+* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+
+## Working with Markdown
+
+You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+
+* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
+* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
+* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+
+## For more information
+
+* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
+* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+
+**Enjoy!**
